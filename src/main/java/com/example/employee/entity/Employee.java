@@ -1,4 +1,4 @@
-package com.example.employee.model;
+package com.example.employee.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,13 +13,13 @@ import javax.persistence.Id;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "build")
 @Builder
 public class Employee {
-     @Id
-     @GeneratedValue(strategy = GenerationType.AUTO)
-     private Long empId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long empId;
     private String name;
     private String joiningDate;
-
+    private String email;
 }
