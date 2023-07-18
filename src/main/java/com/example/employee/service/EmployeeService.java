@@ -1,16 +1,25 @@
 package com.example.employee.service;
 
-import com.example.employee.model.Employee;
+import com.example.employee.entity.Employee;
+import com.example.employee.exception.UserNotFoundException;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
+import java.util.Map;
 
 public interface EmployeeService {
     Employee saveEmployee(Employee employee);
 
-    List<Employee> fetchEmployeeList();
+    List<Employee> fetchAllEmployees();
 
-    Employee updateEmployee(Employee employee, Long empId);
+    List<Employee> fetchEmployeeList(PageRequest pageRequest);
 
-    void deleteEmployeeById(Long empId);
+    Employee updateEmployee(Employee employee, Long empId) throws UserNotFoundException;
+
+    Employee updateEmployee(Long empId, Map<String, Object> fields) throws Exception;
+
+    Employee getEmployee(Long empId) throws UserNotFoundException;
+
+    void deleteEmployeeById(Long empId) throws Exception;
 
 }

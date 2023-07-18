@@ -1,53 +1,69 @@
 package com.example.employee.resources;
 
-import com.example.employee.model.Employee;
+import com.example.employee.dto.EmpRQ;
+import com.example.employee.entity.Employee;
+import com.example.employee.exception.UserNotFoundException;
 import com.example.employee.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import javax.validation.Valid;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
+@RequestMapping("/employees")
 public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
 
-    @GetMapping(value = "/employee")
-    List<Employee> getAllEmployees() {
-        return employeeService.fetchEmployeeList();
+    @GetMapping
+    public ResponseEntity<List<Employee>> getPaginatedEmployees(
+            @RequestParam(name="page", defaultValue = "1") int page,
+            @RequestParam(name="size", defaultValue = "100") int size
+            ) {
+        //TODO Need to fix, Page<Employee> from repository returning empty content
+        return ResponseEntity.ok(employeeService.fetchEmployeeList(PageRequest.of(page, size)));
     }
 
-    @PostMapping(value = "/employee")
-    public Employee saveEmployee(@Valid @RequestBody  Employee employee) {
-        return employeeService.saveEmployee(employee);
+    @GetMapping("/all")
+    public ResponseEntity<List<Employee>> getAllEmployees() {
+        return ResponseEntity.ok(employeeService.fetchAllEmployees());
     }
 
-    @GetMapping(value = "/employee/{id}")
-    public Employee saveEmployee(@PathVariable("id") Long empId) {
-        List<Employee> empList =  employeeService.fetchEmployeeList()
-                .stream()
-                .filter(employee -> employee.getEmpId() == empId)
-                .collect(Collectors.toList());
-        if(empList.size() != 0) {
-            return empList.get(0);
-        } else {
-            return null;
-        }
+    @PostMapping
+    public ResponseEntity<Employee> saveEmployee(@RequestBody  @Valid EmpRQ empRQ) {
+        Employee employee = Employee.build(null, empRQ.getName(), empRQ.getJoiningDate(), empRQ.getEmail());
+        return ResponseEntity.ok(employeeService.saveEmployee(employee));
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<Employee> saveEmployee(@PathVariable("id") Long empId) throws Exception {
+        return ResponseEntity.ok(employeeService.getEmployee(empId));
     }
 
     // PUT operation : To update
-    @PutMapping(value = "/employee/{id}")
-    public Employee updateEmployee(@RequestBody Employee employee, @PathVariable("id") Long empId)  {
-        return employeeService.updateEmployee(employee,  empId);
+    @PutMapping(value = "/v1/{id}")
+    public ResponseEntity<Employee> updateEmployee(@RequestBody  @Valid EmpRQ empRQ, @PathVariable("id") Long empId) throws Exception {
+        Employee employee = Employee.build(empId, empRQ.getName(), empRQ.getJoiningDate(), empRQ.getEmail());
+        return ResponseEntity.ok(employeeService.updateEmployee(employee,  empId));
     }
 
-    @DeleteMapping(value = "/employee/{id}")
-    public String deleteEmployee(@PathVariable("id") Long empId) {
+    @PatchMapping(value = "/{id}")
+    public ResponseEntity<Employee> updateEmployeeFields(@PathVariable("id") Long empId, @RequestBody Map<String, Object> fields) throws Exception {
+
+        return ResponseEntity.ok(employeeService.updateEmployee(empId, fields));
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity<String> deleteEmployee(@PathVariable("id") Long empId) throws Exception {
         employeeService.deleteEmployeeById(empId);
-        return empId + " Deleted successfully!";
+        // Return a 200 OK response with a message indicating that the employee was deleted
+        return ResponseEntity.ok(empId +" Deleted successfully.");
     }
 
 }

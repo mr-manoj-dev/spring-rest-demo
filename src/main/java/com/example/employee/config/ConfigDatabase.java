@@ -1,6 +1,6 @@
 package com.example.employee.config;
 
-import com.example.employee.model.Employee;
+import com.example.employee.entity.Employee;
 import com.example.employee.repository.EmployeeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +15,10 @@ public class ConfigDatabase {
     CommandLineRunner initDatabase(EmployeeRepository repository) {
 
         return args -> {
-            log.info("Preloading " + repository.save(new Employee(101l, "John", "2021-12-01")));
-            log.info("Preloading " + repository.save(new Employee(102l, "Alex", "2021-11-23")));
-            log.info("Preloading " + repository.save(new Employee(103l, "Ryan", "2021-10-10")));
-            log.info("Preloading " + repository.save(new Employee(104l, "Andy", "2021-09-14")));
+            log.info("Preloading " + repository.save(Employee.builder().empId(101l).name("John").joiningDate("2021-12-01").email("john.l@test.com").build()));
+            log.info("Preloading " + repository.save(Employee.builder().empId(102l).name("Alex").joiningDate("2021-11-23").email("john.l@test.com").build()));
+            log.info("Preloading " + repository.save(Employee.builder().empId(103l).name("Ryan").joiningDate("2021-10-10").email("john.l@test.com").build()));
+            log.info("Preloading " + repository.save(Employee.builder().empId(104l).name("Andy").joiningDate("2021-09-14").email("john.l@test.com").build()));
         };
     }
 }
